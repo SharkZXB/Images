@@ -4,12 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.load.engine.GlideException;
-import com.sharkz.images.glide.GlideImage;
-import com.sharkz.images.glide.listener.OnProgressListenerImpl;
+import com.sharkz.glide.GlideImage;
+import com.sharkz.glide.listener.OnProgressListenerImpl;
 
 /**
  * ================================================

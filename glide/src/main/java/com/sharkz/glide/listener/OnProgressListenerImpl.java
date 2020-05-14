@@ -1,10 +1,9 @@
-package com.sharkz.images.glide.listener;
+package com.sharkz.glide.listener;
 
 import android.text.TextUtils;
 
 import com.bumptech.glide.load.engine.GlideException;
-import com.sharkz.images.glide.listener.OnProgressListener;
-import com.sharkz.images.glide.tool.HandlerUtil;
+import com.sharkz.glide.tool.HandlerUtil;
 
 /**
  * ================================================

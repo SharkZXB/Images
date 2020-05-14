@@ -1,8 +1,4 @@
-package com.sharkz.images.glide.config;
-
-import android.content.Context;
-
-import com.sharkz.images.glide.R;
+package com.sharkz.glide.config;
 
 /**
  * ================================================

@@ -2,8 +2,6 @@ package com.sharkz.images;
 
 import android.app.Application;
 
-import com.sharkz.images.glide.config.GlideImageConfig;
-
 /**
  * ================================================
  * 作    者：SharkZ

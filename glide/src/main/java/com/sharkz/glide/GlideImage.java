@@ -1,4 +1,4 @@
-package com.sharkz.images.glide;
+package com.sharkz.glide;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,15 +24,15 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
-import com.sharkz.images.glide.config.GlideApp;
-import com.sharkz.images.glide.config.GlideImageConfig;
-import com.sharkz.images.glide.listener.GlideImageListener;
-import com.sharkz.images.glide.okhttp.ImageSize;
-import com.sharkz.images.glide.listener.OnProgressListener;
-import com.sharkz.images.glide.okhttp.ProgressManager;
-import com.sharkz.images.glide.tranform.BlurBitmapTransformation;
-import com.sharkz.images.glide.tranform.GlideCircleTransformation;
-import com.sharkz.images.glide.tranform.RoundBitmapTransformation;
+import com.sharkz.glide.config.GlideImageConfig;
+import com.sharkz.glide.okhttp.ImageSize;
+import com.sharkz.glide.config.GlideApp;
+import com.sharkz.glide.listener.GlideImageListener;
+import com.sharkz.glide.listener.OnProgressListener;
+import com.sharkz.glide.okhttp.ProgressManager;
+import com.sharkz.glide.tranform.BlurBitmapTransformation;
+import com.sharkz.glide.tranform.GlideCircleTransformation;
+import com.sharkz.glide.tranform.RoundBitmapTransformation;
 
 /**
  * ================================================

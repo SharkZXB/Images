@@ -1,4 +1,4 @@
-package com.sharkz.images.glide.config;
+package com.sharkz.glide.config;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -7,8 +7,8 @@ import android.os.AsyncTask;
 import androidx.annotation.UiThread;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.sharkz.images.glide.listener.GlideImageListener;
+import com.sharkz.glide.config.GlideApp;
+import com.sharkz.glide.listener.GlideImageListener;
 
 import java.io.File;
 

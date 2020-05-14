@@ -1,4 +1,4 @@
-package com.sharkz.images.glide.tool;
+package com.sharkz.glide.tool;
 
 import android.os.Handler;
 import android.os.Looper;

@@ -1,9 +1,9 @@
-package com.sharkz.images.glide.okhttp;
+package com.sharkz.glide.okhttp;
 
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.load.engine.GlideException;
-import com.sharkz.images.glide.listener.OnProgressListener;
+import com.sharkz.glide.listener.OnProgressListener;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;

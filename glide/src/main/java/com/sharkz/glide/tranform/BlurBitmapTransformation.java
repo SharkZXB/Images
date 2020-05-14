@@ -1,4 +1,4 @@
-package com.sharkz.images.glide.tranform;
+package com.sharkz.glide.tranform;
 
 import android.graphics.Bitmap;
 

@@ -1,4 +1,4 @@
-package com.sharkz.images.glide.okhttp;
+package com.sharkz.glide.okhttp;
 
 /**
  * ================================================

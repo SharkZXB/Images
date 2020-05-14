@@ -1,4 +1,4 @@
-package com.sharkz.images.glide.config;
+package com.sharkz.glide.config;
 
 import android.content.Context;
 
@@ -11,7 +11,7 @@ import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.module.AppGlideModule;
-import com.sharkz.images.glide.okhttp.ProgressManager;
+import com.sharkz.glide.okhttp.ProgressManager;
 
 import java.io.InputStream;
 
