@@ -63,4 +63,48 @@ public class LuBan {
     //    .observeOn(AndroidSchedulers.mainThread())
     //    .subscribe();
 
+
+    // TODO 所有函数调用
+    // Luban.with(this) // 上下文
+    //                .load(photos)    // 需要压缩的图片
+    //                .ignoreBy(100)   // 单位 KB 默认小于100KB 不压缩
+    //                .setTargetDir(getPath()) // 压缩问价目标目录
+    //                .setFocusAlpha(false) //
+    //                .filter(new CompressionPredicate() { // 对于给定的输入路径，返回true或false的函数接口(回调)应该进行压缩。
+    //                    @Override
+    //                    public boolean apply(String path) {
+    //                        return !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif"));
+    //                    }
+    //                })
+    //                .setRenameListener(new OnRenameListener() { // 提供修改压缩图片命名接口
+    //                    @Override
+    //                    public String rename(String filePath) {
+    //                        try {
+    //                            MessageDigest md = MessageDigest.getInstance("MD5");
+    //                            md.update(filePath.getBytes());
+    //                            return new BigInteger(1, md.digest()).toString(32);
+    //                        } catch (NoSuchAlgorithmException e) {
+    //                            e.printStackTrace();
+    //                        }
+    //                        return "";
+    //                    }
+    //                })
+    //                .setCompressListener(new OnCompressListener() { // 压缩监听回调
+    //                    @Override
+    //                    public void onStart() {
+    //                        // 开始压缩任务
+    //                    }
+    //
+    //                    @Override
+    //                    public void onSuccess(File file) {
+    //                        // 压缩成功
+    //                        Log.i(TAG, file.getAbsolutePath());
+    //                        showResult(originPhotos, file);
+    //                    }
+    //
+    //                    @Override
+    //                    public void onError(Throwable e) {
+    //                        // 压缩异常
+    //                    }
+    //                }).launch(); // 开启压缩任务
 }
