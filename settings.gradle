@@ -1,3 +1,4 @@
 rootProject.name='Images'
 include ':app', ':imageloader'
 include ':glide'
+include ':luban'
