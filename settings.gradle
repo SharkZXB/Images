@@ -1,3 +1,4 @@
+include ':shape'
 rootProject.name='Images'
 include ':app', ':imageloader'
 include ':glide'
