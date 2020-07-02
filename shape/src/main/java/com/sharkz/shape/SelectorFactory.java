@@ -1,4 +1,4 @@
-package com.sharkz.shape.sdkv2;
+package com.sharkz.shape;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -15,17 +15,17 @@ import java.lang.annotation.RetentionPolicy;
 
 
 /**
- * Created by LuLiang on 2018/2/10.
- * <p>
- * 背景状态选择器（颜色背景、图片背景）
- *
- * @author LuLiang
- * @github https://github.com/LiangLuDev
+ * ================================================
+ * 作    者：SharkZ
+ * 邮    箱：229153959@qq.com
+ * 创建日期：2020/7/1  16:27
+ * 描    述 背景状态选择器（颜色背景、图片背景）
+ * 修订历史：
+ * ================================================
  */
+public class SelectorFactory implements IShapeFactory<Drawable, View> {
 
-public class DevSelector implements IDevUtils<Drawable, View> {
-
-    static DevSelector mDevSelector;
+    static SelectorFactory mSelectorFactory;
     //选中背景颜色
     private Drawable mSelectDrawable;
     //正常背景颜色
@@ -75,13 +75,23 @@ public class DevSelector implements IDevUtils<Drawable, View> {
     }
 
 
-    public static DevSelector getInstance() {
-        mDevSelector = new DevSelector();
-        return mDevSelector;
+    // =============================================================================================
+
+
+    private SelectorFactory() {
+        // 构造方法私有
+    }
+
+    public static SelectorFactory getInstance() {
+        mSelectorFactory = new SelectorFactory();
+        return mSelectorFactory;
     }
 
 
-    public DevSelector selector(@SelectorState int selectorState, Drawable selectDrawable, Drawable normalDrawable) {
+    // =============================================================================================
+
+
+    public SelectorFactory selector(@SelectorState int selectorState, Drawable selectDrawable, Drawable normalDrawable) {
         this.state = selectorState;
         this.mSelectDrawable = selectDrawable;
         this.mNormalDrawable = normalDrawable;
@@ -96,7 +106,7 @@ public class DevSelector implements IDevUtils<Drawable, View> {
      * @param normalDrawable  正常颜色 例：Context.getResources.getDrawable(R.drawable/mipmap.xxx)
      * @return DevSelector
      */
-    public DevSelector selectorPressed(Drawable pressedDrawable, Drawable normalDrawable) {
+    public SelectorFactory selectorPressed(Drawable pressedDrawable, Drawable normalDrawable) {
         this.state = STATE_PRESSED;
         this.mSelectDrawable = pressedDrawable;
         this.mNormalDrawable = normalDrawable;
@@ -111,8 +121,9 @@ public class DevSelector implements IDevUtils<Drawable, View> {
      * @param disableDrawable 不可点击(可用)颜色 例：Context.getResources.getDrawable(R.drawable/mipmap.xxx)
      * @return DevSelector
      */
-    public DevSelector selectorEnable(Drawable enableDrawable, Drawable disableDrawable) {
-        this.state = STATE_ENABLED;
+    public SelectorFactory selectorEnable(Drawable enableDrawable, Drawable disableDrawable) {
+        //this.state = STATE_ENABLED;
+        this.state = STATE_SELECTED;
         this.mSelectDrawable = enableDrawable;
         this.mNormalDrawable = disableDrawable;
         return this;
@@ -126,10 +137,10 @@ public class DevSelector implements IDevUtils<Drawable, View> {
      * @param normalColorResId 正常颜色 例：R.color.colorPrimary
      * @return DevSelector
      */
-    public DevSelector selectorTextColor(@ColorRes int selectColorResId, @ColorRes int normalColorResId) {
+    public SelectorFactory selectorTextColor(@ColorRes int selectColorResId, @ColorRes int normalColorResId) {
         this.isSelectorTextColor = true;
-        this.mSelectTextColor = DevShapeUtils.getContext().getResources().getColor(selectColorResId);
-        this.mNormalTextColor = DevShapeUtils.getContext().getResources().getColor(normalColorResId);
+        this.mSelectTextColor = ShapeUtils.getContext().getResources().getColor(selectColorResId);
+        this.mNormalTextColor = ShapeUtils.getContext().getResources().getColor(normalColorResId);
         return this;
     }
 
@@ -141,7 +152,7 @@ public class DevSelector implements IDevUtils<Drawable, View> {
      * @param normalColor 正常颜色 例：#ffffff
      * @return DevSelector
      */
-    public DevSelector selectorTextColor(String selectColor, String normalColor) {
+    public SelectorFactory selectorTextColor(String selectColor, String normalColor) {
         this.isSelectorTextColor = true;
         this.mSelectTextColor = Color.parseColor(selectColor);
         this.mNormalTextColor = Color.parseColor(normalColor);
@@ -156,12 +167,15 @@ public class DevSelector implements IDevUtils<Drawable, View> {
      * @param normalColorResId 正常颜色 例：databinding获取的资源文件色值
      * @return DevSelector
      */
-    public DevSelector bindSelectorTextColor(int selectColorResId, int normalColorResId) {
+    public SelectorFactory bindSelectorTextColor(int selectColorResId, int normalColorResId) {
         this.isSelectorTextColor = true;
         this.mSelectTextColor = selectColorResId;
         this.mNormalTextColor = normalColorResId;
         return this;
     }
+
+
+    // =============================================================================================
 
 
     @Override
@@ -190,6 +204,10 @@ public class DevSelector implements IDevUtils<Drawable, View> {
     public Drawable build() {
         return createDrawableSelector();
     }
+
+
+    // =============================================================================================
+
 
     /**
      * 创建选中颜色变化

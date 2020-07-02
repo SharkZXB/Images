@@ -1,4 +1,4 @@
-package com.sharkz.shape.sdkv2;
+package com.sharkz.shape;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -15,47 +15,39 @@ import java.lang.annotation.RetentionPolicy;
 
 
 /**
- * Created by LuLiang on 2018/2/11.
- *
- * @author LuLiang
- * @github https://github.com/LiangLuDev
+ * ================================================
+ * 作    者：SharkZ
+ * 邮    箱：229153959@qq.com
+ * 创建日期：2020/7/1  16:27
+ * 描    述 代码动态创建 Shape
+ * 修订历史：
+ * ================================================
  */
-
-public class DevShape implements IDevUtils<Drawable, View> {
+public class ShapeFactory implements IShapeFactory<Drawable, View> {
 
     /**
-     * 样式 --> 矩形 椭圆 圆环 线
+     * Shape样式 --> 矩形 椭圆 圆环 线
      */
     public static final int RECTANGLE = android.graphics.drawable.GradientDrawable.RECTANGLE;
     public static final int OVAL = android.graphics.drawable.GradientDrawable.OVAL;
     public static final int RING = android.graphics.drawable.GradientDrawable.RING;
     public static final int LINE = android.graphics.drawable.GradientDrawable.LINE;
-
     @IntDef({RECTANGLE, OVAL, RING, LINE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Shape {
     }
 
     /**
-     * 方向 --> 线性渐变方向定义
+     * Shape渐变色方向 --> 线性渐变方向定义
      */
-    //上到下渐变
-    public static final String TOP_BOTTOM = "TOP_BOTTOM";
-    //右上到左下渐变
-    public static final String TR_BL = "TR_BL";
-    //右到左渐变
-    public static final String RIGHT_LEFT = "RIGHT_LEFT";
-    //右下到左上渐变
-    public static final String BR_TL = "BR_TL";
-    //下到上渐变
-    public static final String BOTTOM_TOP = "BOTTOM_TOP";
-    //左下到右上渐变
-    public static final String BL_TR = "BL_TR";
-    //左到右渐变
-    public static final String LEFT_RIGHT = "LEFT_RIGHT";
-    //左上到右下渐变
-    public static final String TL_BR = "TL_BR";
-
+    public static final String TOP_BOTTOM = "TOP_BOTTOM";   //上到下渐变
+    public static final String TR_BL = "TR_BL";             //右上到左下渐变
+    public static final String RIGHT_LEFT = "RIGHT_LEFT";   //右到左渐变
+    public static final String BR_TL = "BR_TL";             //右下到左上渐变
+    public static final String BOTTOM_TOP = "BOTTOM_TOP";   //下到上渐变
+    public static final String BL_TR = "BL_TR";             //左下到右上渐变
+    public static final String LEFT_RIGHT = "LEFT_RIGHT";   //左到右渐变
+    public static final String TL_BR = "TL_BR";             //左上到右下渐变
     @StringDef({TOP_BOTTOM, TR_BL, RIGHT_LEFT, BR_TL, BOTTOM_TOP, BL_TR, LEFT_RIGHT, TL_BR})
     @Retention(RetentionPolicy.SOURCE)
     public @interface GradientOrientation {
@@ -65,7 +57,7 @@ public class DevShape implements IDevUtils<Drawable, View> {
     // =============================================================================================
 
 
-    static DevShape mDevShape;
+    static ShapeFactory mShapeFactory;
 
     //渐变类型  默认线性
     private int gradientType = GradientDrawable.LINEAR_GRADIENT;
@@ -100,7 +92,6 @@ public class DevShape implements IDevUtils<Drawable, View> {
     private @GradientOrientation
     String gradientOrientation = TOP_BOTTOM;
 
-
     /*设置样式标志位*/
     //是否设置背景
     private boolean isBackgroundColor;
@@ -130,13 +121,13 @@ public class DevShape implements IDevUtils<Drawable, View> {
     /**
      * 创建当前实例
      *
-     * @param shapeModel
+     * @param shapeModel shape样式
      * @return
      */
-    public static DevShape getInstance(int shapeModel) {
-        mDevShape = new DevShape();
+    public static ShapeFactory getInstance(int shapeModel) {
+        mShapeFactory = new ShapeFactory();
         shape = shapeModel;
-        return mDevShape;
+        return mShapeFactory;
     }
 
 
@@ -149,9 +140,9 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param backgroundColorResId 例：R.color.colorPrimary
      * @return BaseShape
      */
-    public DevShape solid(@ColorRes int backgroundColorResId) {
+    public ShapeFactory solid(@ColorRes int backgroundColorResId) {
         this.isBackgroundColor = true;
-        this.backgroundColor = DevShapeUtils.getContext().getResources().getColor(backgroundColorResId);
+        this.backgroundColor = ShapeUtils.getContext().getResources().getColor(backgroundColorResId);
         return this;
     }
 
@@ -161,9 +152,9 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param backgroundColor 例：#ffffff
      * @return BaseShape
      */
-    public DevShape solid(String backgroundColor) {
-        if (TextUtils.isEmpty(backgroundColor)){
-            backgroundColor="#333333";
+    public ShapeFactory solid(String backgroundColor) {
+        if (TextUtils.isEmpty(backgroundColor)) {
+            backgroundColor = "#333333";
         }
         this.isBackgroundColor = true;
         this.backgroundColor = Color.parseColor(backgroundColor);
@@ -178,10 +169,10 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param lineWidth      边框线宽度 dp
      * @return BaseShape
      */
-    public DevShape line(int lineWidth, @ColorRes int lineColorResId) {
+    public ShapeFactory line(int lineWidth, @ColorRes int lineColorResId) {
         this.isLine = true;
         this.lineWidth = lineWidth;
-        this.lineColor = DevShapeUtils.getContext().getResources().getColor(lineColorResId);
+        this.lineColor = ShapeUtils.getContext().getResources().getColor(lineColorResId);
         return this;
     }
 
@@ -192,28 +183,12 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param lineWidth 边框线宽度 dp
      * @return BaseShape
      */
-    public DevShape line(int lineWidth, String lineColor) {
+    public ShapeFactory line(int lineWidth, String lineColor) {
         this.isLine = true;
         this.lineWidth = lineWidth;
         this.lineColor = Color.parseColor(lineColor);
         return this;
     }
-
-
-    /**
-     * bindLine 边框实线样式 - 仅供databinding使用
-     *
-     * @param lineColor 边框线颜色  databinding获取的资源文件色值
-     * @param lineWidth 边框线宽度 dp
-     * @return BaseShape
-     */
-    public DevShape bindLine(int lineWidth, int lineColor) {
-        this.isLine = true;
-        this.lineWidth = lineWidth;
-        this.lineColor = lineColor;
-        return this;
-    }
-
 
     /**
      * 边框虚线样式
@@ -224,12 +199,12 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param dashGap            间隙宽度 dp
      * @return BaseShape
      */
-    public DevShape dashLine(int dashLineWidth, @ColorRes int dashLineColorResId, float dashWidth, float dashGap) {
+    public ShapeFactory dashLine(int dashLineWidth, @ColorRes int dashLineColorResId, float dashWidth, float dashGap) {
         this.isDashLine = true;
         this.dashLineWidth = dashLineWidth;
         this.dashWidth = dashWidth;
         this.dashGap = dashGap;
-        this.dashLineColor = DevShapeUtils.getContext().getResources().getColor(dashLineColorResId);
+        this.dashLineColor = ShapeUtils.getContext().getResources().getColor(dashLineColorResId);
         return this;
     }
 
@@ -243,7 +218,7 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param dashGap       间隙宽度 dp
      * @return BaseShape
      */
-    public DevShape dashLine(int dashLineWidth, String dashLineColor, float dashWidth, float dashGap) {
+    public ShapeFactory dashLine(int dashLineWidth, String dashLineColor, float dashWidth, float dashGap) {
         this.isDashLine = true;
         this.dashLineWidth = dashLineWidth;
         this.dashWidth = dashWidth;
@@ -252,23 +227,9 @@ public class DevShape implements IDevUtils<Drawable, View> {
         return this;
     }
 
-    /**
-     * 边框虚线样式 - 仅供databinding使用
-     *
-     * @param dashLineColor 边框线颜色  databinding获取的资源文件色值
-     * @param dashLineWidth 边框虚线宽度 dp
-     * @param dashWidth     虚线宽度 dp
-     * @param dashGap       间隙宽度 dp
-     * @return BaseShape
-     */
-    public DevShape bindDashLine(int dashLineWidth, int dashLineColor, float dashWidth, float dashGap) {
-        this.isDashLine = true;
-        this.dashLineWidth = dashLineWidth;
-        this.dashWidth = dashWidth;
-        this.dashGap = dashGap;
-        this.dashLineColor = dashLineColor;
-        return this;
-    }
+
+    // =============================================================================================
+
 
     /**
      * 渐变样式
@@ -279,11 +240,11 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param endColor   渐变结束端颜色 例：R.color.colorPrimary
      * @return BaseShape
      */
-    public DevShape gradient(@ColorRes int startColor, @ColorRes int endColor) {
+    public ShapeFactory gradient(@ColorRes int startColor, @ColorRes int endColor) {
         this.isGradient = true;
         this.gradientColors = new int[2];
-        this.gradientColors[0] = DevShapeUtils.getContext().getResources().getColor(startColor);
-        this.gradientColors[1] = DevShapeUtils.getContext().getResources().getColor(endColor);
+        this.gradientColors[0] = ShapeUtils.getContext().getResources().getColor(startColor);
+        this.gradientColors[1] = ShapeUtils.getContext().getResources().getColor(endColor);
         this.gradientType = GradientDrawable.LINEAR_GRADIENT;
         this.gradientOrientation = TOP_BOTTOM;
         return this;
@@ -298,7 +259,7 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param endColor   渐变结束端颜色 例：#ffffff
      * @return BaseShape
      */
-    public DevShape gradient(String startColor, String endColor) {
+    public ShapeFactory gradient(String startColor, String endColor) {
         this.isGradient = true;
         this.gradientColors = new int[2];
         this.gradientColors[0] = Color.parseColor(startColor);
@@ -316,14 +277,14 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param gradientColorsResId 渐变颜色数组 数组元素 例：R.color.colorPrimary
      * @return BaseShape
      */
-    public DevShape gradientLinear(@ColorRes int... gradientColorsResId) {
+    public ShapeFactory gradientLinear(@ColorRes int... gradientColorsResId) {
         this.isGradient = true;
         this.gradientType = GradientDrawable.LINEAR_GRADIENT;
         this.gradientOrientation = TOP_BOTTOM;
         if (gradientColorsResId.length > 1) {
             this.gradientColors = new int[gradientColorsResId.length];
             for (int i = 0; i < gradientColorsResId.length; i++) {
-                this.gradientColors[i] = DevShapeUtils.getContext().getResources().getColor(gradientColorsResId[i]);
+                this.gradientColors[i] = ShapeUtils.getContext().getResources().getColor(gradientColorsResId[i]);
             }
         } else {
             throw new ExceptionInInitializerError("渐变颜色数组至少需要两个颜色");
@@ -339,7 +300,7 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param gradientColorsResId 渐变颜色数组 数组元素 例：#ffffff
      * @return BaseShape
      */
-    public DevShape gradientLinear(String... gradientColorsResId) {
+    public ShapeFactory gradientLinear(String... gradientColorsResId) {
         this.isGradient = true;
         this.gradientType = GradientDrawable.LINEAR_GRADIENT;
         this.gradientOrientation = TOP_BOTTOM;
@@ -354,38 +315,16 @@ public class DevShape implements IDevUtils<Drawable, View> {
         return this;
     }
 
-
-    /**
-     * 线性渐变样式-- 仅供databinding使用
-     * 默认方向 从上到下渐变 TOP_BOTTOM
-     *
-     * @param gradientColors 渐变颜色数组 数组元素 databinding获取的资源文件色值
-     * @return BaseShape
-     */
-    public DevShape bindGradientLinear(int... gradientColors) {
-        this.isGradient = true;
-        this.gradientType = GradientDrawable.LINEAR_GRADIENT;
-        this.gradientOrientation = TOP_BOTTOM;
-        if (gradientColors.length > 1) {
-            this.gradientColors = new int[gradientColors.length];
-            System.arraycopy(gradientColors, 0, this.gradientColors, 0, gradientColors.length);
-        } else {
-            throw new ExceptionInInitializerError("渐变颜色数组至少需要两个颜色");
-        }
-        return this;
-    }
-
     /**
      * 设置渐变方向
      *
      * @param gradientOrientation 渐变方向
      * @return BaseShape
      */
-    public DevShape orientation(@GradientOrientation String gradientOrientation) {
+    public ShapeFactory orientation(@GradientOrientation String gradientOrientation) {
         this.gradientOrientation = gradientOrientation;
         return this;
     }
-
 
     /**
      * 扫描渐变样式
@@ -393,13 +332,13 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param gradientColors 渐变颜色数组 数组元素 例：R.color.colorPrimary
      * @return BaseShape
      */
-    public DevShape gradientSweep(@ColorRes int... gradientColors) {
+    public ShapeFactory gradientSweep(@ColorRes int... gradientColors) {
         this.isGradient = true;
         this.gradientType = GradientDrawable.SWEEP_GRADIENT;
         if (gradientColors.length > 1) {
             this.gradientColors = new int[gradientColors.length];
             for (int i = 0; i < gradientColors.length; i++) {
-                this.gradientColors[i] = DevShapeUtils.getContext().getResources().getColor(gradientColors[i]);
+                this.gradientColors[i] = ShapeUtils.getContext().getResources().getColor(gradientColors[i]);
             }
         } else {
             throw new ExceptionInInitializerError("渐变颜色数组至少需要两个颜色");
@@ -414,7 +353,7 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param gradientColors 渐变颜色数组 数组元素 例：#ffffff
      * @return BaseShape
      */
-    public DevShape gradientSweep(String... gradientColors) {
+    public ShapeFactory gradientSweep(String... gradientColors) {
         this.isGradient = true;
         this.gradientType = GradientDrawable.SWEEP_GRADIENT;
         if (gradientColors.length > 1) {
@@ -435,14 +374,14 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param gradientColors 渐变颜色数组 数组元素 例：R.color.colorPrimary
      * @return BaseShape
      */
-    public DevShape gradientRadial(float radialRadius, int... gradientColors) {
+    public ShapeFactory gradientRadial(float radialRadius, int... gradientColors) {
         this.isGradient = true;
         this.gradientType = GradientDrawable.RADIAL_GRADIENT;
         this.radialRadius = radialRadius;
         if (gradientColors.length > 1) {
             this.gradientColors = new int[gradientColors.length];
             for (int i = 0; i < gradientColors.length; i++) {
-                this.gradientColors[i] = DevShapeUtils.getContext().getResources().getColor(gradientColors[i]);
+                this.gradientColors[i] = ShapeUtils.getContext().getResources().getColor(gradientColors[i]);
             }
         } else {
             throw new ExceptionInInitializerError("渐变颜色数组至少需要两个颜色");
@@ -458,7 +397,7 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param radialRadius   辐射渐变半径
      * @return BaseShape
      */
-    public DevShape gradientRadial(float radialRadius, String... gradientColors) {
+    public ShapeFactory gradientRadial(float radialRadius, String... gradientColors) {
         this.isGradient = true;
         this.gradientType = GradientDrawable.RADIAL_GRADIENT;
         this.radialRadius = radialRadius;
@@ -474,12 +413,15 @@ public class DevShape implements IDevUtils<Drawable, View> {
     }
 
 
+    // =============================================================================================
+
+
     /**
      * 设置圆角弧度 默认设置4个圆角
      *
      * @param radius 圆角弧度
      */
-    public DevShape radius(float radius) {
+    public ShapeFactory radius(float radius) {
         this.isRadius = true;
         this.topRightRadius = radius;
         this.topLeftRadius = radius;
@@ -494,7 +436,7 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param topRightRadius 圆角弧度
      * @return DevShape
      */
-    public DevShape trRadius(float topRightRadius) {
+    public ShapeFactory trRadius(float topRightRadius) {
         this.isRadius = true;
         this.topRightRadius = topRightRadius;
         return this;
@@ -507,7 +449,7 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param topLeftRadius 圆角弧度
      * @return DevShape
      */
-    public DevShape tlRadius(float topLeftRadius) {
+    public ShapeFactory tlRadius(float topLeftRadius) {
         this.isRadius = true;
         this.topLeftRadius = topLeftRadius;
         return this;
@@ -520,7 +462,7 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param bottomRightRadius 圆角弧度
      * @return DevShape
      */
-    public DevShape brRadius(float bottomRightRadius) {
+    public ShapeFactory brRadius(float bottomRightRadius) {
         this.isRadius = true;
         this.bottomRightRadius = bottomRightRadius;
         return this;
@@ -532,11 +474,14 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @param bottomLeftRadius 圆角弧度
      * @return DevShape
      */
-    public DevShape blRadius(float bottomLeftRadius) {
+    public ShapeFactory blRadius(float bottomLeftRadius) {
         this.isRadius = true;
         this.bottomLeftRadius = bottomLeftRadius;
         return this;
     }
+
+
+    // =============================================================================================
 
 
     @Override
@@ -548,6 +493,9 @@ public class DevShape implements IDevUtils<Drawable, View> {
     public Drawable build() {
         return createShape();
     }
+
+
+    // =============================================================================================
 
 
     /**
@@ -592,7 +540,6 @@ public class DevShape implements IDevUtils<Drawable, View> {
                     break;
                 case GradientDrawable.SWEEP_GRADIENT:
                     break;
-
             }
             drawable.setGradientType(gradientType);
             drawable.setColors(gradientColors);
@@ -646,7 +593,7 @@ public class DevShape implements IDevUtils<Drawable, View> {
      * @return 返回值
      */
     private int dip2px(float dipValue) {
-        final float scale = DevShapeUtils.getContext().getResources().getDisplayMetrics().density;
+        final float scale = ShapeUtils.getContext().getResources().getDisplayMetrics().density;
         return (int) (dipValue * scale + 0.5f);
     }
 

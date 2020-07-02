@@ -1,30 +1,39 @@
-package com.sharkz.shape.sdkv1;
+package com.sharkz.shape;
 
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.view.View;
 
+
 /**
  * ================================================
  * 作    者：SharkZ
  * 邮    箱：229153959@qq.com
- * 创建日期：2020/7/1  16:48
- * 描    述 层 多层Drawable 一起使用
+ * 创建日期：2020/7/2  10:13
+ * 描    述 层级 Shape 工厂
  * 修订历史：
  * ================================================
  */
-public class LayerFactory {
+public class LayerFactory implements IShapeFactory<Drawable, View> {
 
+
+    /**
+     * 有层级能力的 Drawable
+     */
     private LayerDrawable drawable;
 
-    public LayerFactory(Drawable[] drawables) {
+    private LayerFactory(Drawable[] drawables) {
         drawable = new LayerDrawable(drawables);
     }
 
-    public static LayerFactory create(Drawable... drawables) {
+    public static LayerFactory getInstance(Drawable... drawables) {
         return new LayerFactory(drawables);
     }
+
+
+    // =============================================================================================
+
 
     public LayerFactory Left(int index, int px) {
         drawable.setLayerInset(index, 0, 0, 0, px);
@@ -46,21 +55,26 @@ public class LayerFactory {
         return this;
     }
 
-    public LayerFactory setInset(int index,int left,int top,int right,int bottom) {
+    public LayerFactory setInset(int index, int left, int top, int right, int bottom) {
         drawable.setLayerInset(index, left, top, right, bottom);
         return this;
     }
 
-    public void build(View view) {
+
+    // =============================================================================================
+
+
+    @Override
+    public void into(View view) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             view.setBackground(drawable);
-        }else {
+        } else {
             view.setBackgroundDrawable(drawable);
         }
     }
 
+    @Override
     public Drawable build() {
-        return drawable;
+        return null;
     }
-    
 }

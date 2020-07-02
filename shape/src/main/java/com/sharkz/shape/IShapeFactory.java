@@ -1,4 +1,4 @@
-package com.sharkz.shape.sdkv2;
+package com.sharkz.shape;
 
 import android.view.View;
 
@@ -8,11 +8,11 @@ import android.view.View;
  * 作    者：SharkZ
  * 邮    箱：229153959@qq.com
  * 创建日期：2020/7/1  16:48
- * 描    述
+ * 描    述 能力提供 定义  https://github.com/LiangLuDev
  * 修订历史：
  * ================================================
  */
-public interface IDevUtils<T,V extends View> {
+public interface IShapeFactory<T, V extends View> {
 
     /**
      * 直接设置样式到view
