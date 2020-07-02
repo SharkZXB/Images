@@ -1,17 +1,13 @@
 package com.sharkz.shape;
 
+import android.annotation.SuppressLint;
+import android.app.Application;
+import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.text.TextUtils;
-import android.view.View;
 
 import androidx.annotation.ColorRes;
-import androidx.annotation.IntDef;
-import androidx.annotation.StringDef;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 
 /**
@@ -19,582 +15,146 @@ import java.lang.annotation.RetentionPolicy;
  * 作    者：SharkZ
  * 邮    箱：229153959@qq.com
  * 创建日期：2020/7/1  16:27
- * 描    述 代码动态创建 Shape
+ * 描    述 统一处理 shape 减少xml资源泛滥
+ * https://github.com/DrownCoder/SupperShape
+ * https://github.com/LiangLuDev/DevShapeUtils
  * 修订历史：
  * ================================================
  */
-public class ShapeFactory implements IShapeFactory<Drawable, View> {
+public class ShapeFactory {
+
+    @SuppressLint("StaticFieldLeak")
+    private static Application context;
 
     /**
-     * Shape样式 --> 矩形 椭圆 圆环 线
-     */
-    public static final int RECTANGLE = android.graphics.drawable.GradientDrawable.RECTANGLE;
-    public static final int OVAL = android.graphics.drawable.GradientDrawable.OVAL;
-    public static final int RING = android.graphics.drawable.GradientDrawable.RING;
-    public static final int LINE = android.graphics.drawable.GradientDrawable.LINE;
-    @IntDef({RECTANGLE, OVAL, RING, LINE})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Shape {
-    }
-
-    /**
-     * Shape渐变色方向 --> 线性渐变方向定义
-     */
-    public static final String TOP_BOTTOM = "TOP_BOTTOM";   //上到下渐变
-    public static final String TR_BL = "TR_BL";             //右上到左下渐变
-    public static final String RIGHT_LEFT = "RIGHT_LEFT";   //右到左渐变
-    public static final String BR_TL = "BR_TL";             //右下到左上渐变
-    public static final String BOTTOM_TOP = "BOTTOM_TOP";   //下到上渐变
-    public static final String BL_TR = "BL_TR";             //左下到右上渐变
-    public static final String LEFT_RIGHT = "LEFT_RIGHT";   //左到右渐变
-    public static final String TL_BR = "TL_BR";             //左上到右下渐变
-    @StringDef({TOP_BOTTOM, TR_BL, RIGHT_LEFT, BR_TL, BOTTOM_TOP, BL_TR, LEFT_RIGHT, TL_BR})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface GradientOrientation {
-    }
-
-
-    // =============================================================================================
-
-
-    static ShapeFactory mShapeFactory;
-
-    //渐变类型  默认线性
-    private int gradientType = GradientDrawable.LINEAR_GRADIENT;
-
-    //样式形状 默认矩形
-    private static int shape = RECTANGLE;
-
-    //背景颜色
-    private int backgroundColor;
-    //边框线颜色
-    private int lineColor;
-    //实线宽度 默认1px
-    private int lineWidth = 1;
-
-    /*虚线参数*/
-    //虚线边框宽度 默认1px
-    private int dashLineWidth = 1;
-    //虚线颜色
-    private int dashLineColor = 1;
-    //虚线的实线宽度
-    private float dashWidth = 1;
-    //虚线间隙宽度
-    private float dashGap = 1;
-
-    /*渐变参数*/
-    //渐变颜色数组
-    private int[] gradientColors;
-    //辐射渐变半径
-    private float radialRadius;
-
-    //渐变方向 默认从上到下
-    private @GradientOrientation
-    String gradientOrientation = TOP_BOTTOM;
-
-    /*设置样式标志位*/
-    //是否设置背景
-    private boolean isBackgroundColor;
-    //是否边框实线样式
-    private boolean isLine;
-    //是否边框虚线样式
-    private boolean isDashLine;
-    //是否渐变
-    private boolean isGradient;
-
-    /*设置圆角*/
-    //是否圆角
-    private boolean isRadius;
-    //右上圆角弧度
-    private float topRightRadius = 0;
-    //左上圆角弧度
-    private float topLeftRadius = 0;
-    //右下圆角弧度
-    private float bottomRightRadius = 0;
-    //左下圆角弧度
-    private float bottomLeftRadius = 0;
-
-
-    // =============================================================================================
-
-
-    /**
-     * 创建当前实例
+     * TODO 必须在全局Application先调用，获取context上下文
      *
-     * @param shapeModel shape样式
-     * @return
+     * @param app Application
      */
-    public static ShapeFactory getInstance(int shapeModel) {
-        mShapeFactory = new ShapeFactory();
-        shape = shapeModel;
-        return mShapeFactory;
-    }
-
-
-    // =============================================================================================
-
-
-    /**
-     * 背景填充样式
-     *
-     * @param backgroundColorResId 例：R.color.colorPrimary
-     * @return BaseShape
-     */
-    public ShapeFactory solid(@ColorRes int backgroundColorResId) {
-        this.isBackgroundColor = true;
-        this.backgroundColor = ShapeUtils.getContext().getResources().getColor(backgroundColorResId);
-        return this;
+    public  static void init(Application app) {
+        context = app;
     }
 
     /**
-     * 背景填充样式
-     *
-     * @param backgroundColor 例：#ffffff
-     * @return BaseShape
+     * 获取全局上下文
      */
-    public ShapeFactory solid(String backgroundColor) {
-        if (TextUtils.isEmpty(backgroundColor)) {
-            backgroundColor = "#333333";
+    public static Context getContext() {
+        initialize();
+        return context;
+    }
+
+    /**
+     * 检测是否调用初始化方法
+     */
+    private static void initialize() {
+        if (context == null) {
+            throw new ExceptionInInitializerError("请先在全局Application中调用 DevShapeUtils.init() 初始化！");
         }
-        this.isBackgroundColor = true;
-        this.backgroundColor = Color.parseColor(backgroundColor);
-        return this;
     }
 
 
     /**
-     * 边框实线样式
-     *
-     * @param lineColorResId 边框线颜色 例：R.color.colorPrimary
-     * @param lineWidth      边框线宽度 dp
-     * @return BaseShape
+     * 设置样式（主要是椭圆和矩形）
+     * @param shapeModel 样式类型 例 DevShape.RECTANGLE 矩形
+     * @return OvalShape
      */
-    public ShapeFactory line(int lineWidth, @ColorRes int lineColorResId) {
-        this.isLine = true;
-        this.lineWidth = lineWidth;
-        this.lineColor = ShapeUtils.getContext().getResources().getColor(lineColorResId);
-        return this;
+    public static GradientDrawableFactory shape(@GradientDrawableFactory.Shape int shapeModel) {
+        return GradientDrawableFactory.getInstance(shapeModel);
     }
 
     /**
-     * 边框实线样式
+     * 背景状态选择器（背景颜色）
      *
-     * @param lineColor 边框线颜色 例：#ffffff
-     * @param lineWidth 边框线宽度 dp
-     * @return BaseShape
+     * @param selectorState Selector状态 例：DevSelector.STATE_PRESSED  按压状态
+     * @param pressedColorResId 触摸颜色 例：R.color.colorPrimary
+     * @param normalColorResId  正常颜色 例：R.color.colorPrimary
+     * @return DevSelector
      */
-    public ShapeFactory line(int lineWidth, String lineColor) {
-        this.isLine = true;
-        this.lineWidth = lineWidth;
-        this.lineColor = Color.parseColor(lineColor);
-        return this;
+    public static StateListDrawableFactory selector(@StateListDrawableFactory.SelectorState int selectorState, @ColorRes int pressedColorResId, @ColorRes int normalColorResId) {
+        return StateListDrawableFactory.getInstance().selector(selectorState,new ColorDrawable(ShapeFactory.getContext().getResources().getColor(pressedColorResId)), new ColorDrawable(ShapeFactory.getContext().getResources().getColor(normalColorResId)));
     }
 
     /**
-     * 边框虚线样式
+     * .
+     * 背景状态选择器（背景颜色）
      *
-     * @param dashLineColorResId 边框线颜色 例：R.color.colorPrimary
-     * @param dashLineWidth      边框虚线宽度 dp
-     * @param dashWidth          虚线宽度 dp
-     * @param dashGap            间隙宽度 dp
-     * @return BaseShape
+     * @param selectDrawable 触摸颜色 例：Context.getResources.getDrawable(R.drawable/mipmap.xxx)
+     * @param normalDrawable  正常颜色 例：Context.getResources.getDrawable(R.drawable/mipmap.xxx)
+     * @return DevSelector
      */
-    public ShapeFactory dashLine(int dashLineWidth, @ColorRes int dashLineColorResId, float dashWidth, float dashGap) {
-        this.isDashLine = true;
-        this.dashLineWidth = dashLineWidth;
-        this.dashWidth = dashWidth;
-        this.dashGap = dashGap;
-        this.dashLineColor = ShapeUtils.getContext().getResources().getColor(dashLineColorResId);
-        return this;
-    }
-
-
-    /**
-     * 边框虚线样式
-     *
-     * @param dashLineColor 边框线颜色 例：#ffffff
-     * @param dashLineWidth 边框虚线宽度 dp
-     * @param dashWidth     虚线宽度 dp
-     * @param dashGap       间隙宽度 dp
-     * @return BaseShape
-     */
-    public ShapeFactory dashLine(int dashLineWidth, String dashLineColor, float dashWidth, float dashGap) {
-        this.isDashLine = true;
-        this.dashLineWidth = dashLineWidth;
-        this.dashWidth = dashWidth;
-        this.dashGap = dashGap;
-        this.dashLineColor = Color.parseColor(dashLineColor);
-        return this;
-    }
-
-
-    // =============================================================================================
-
-
-    /**
-     * 渐变样式
-     * 默认 线性渐变 GradientDrawable.LINEAR_GRADIENT
-     * 默认方向 从上到下渐变 GradientDrawable.Orientation.TOP_BOTTOM
-     *
-     * @param startColor 渐变开始端颜色 例：R.color.colorPrimary
-     * @param endColor   渐变结束端颜色 例：R.color.colorPrimary
-     * @return BaseShape
-     */
-    public ShapeFactory gradient(@ColorRes int startColor, @ColorRes int endColor) {
-        this.isGradient = true;
-        this.gradientColors = new int[2];
-        this.gradientColors[0] = ShapeUtils.getContext().getResources().getColor(startColor);
-        this.gradientColors[1] = ShapeUtils.getContext().getResources().getColor(endColor);
-        this.gradientType = GradientDrawable.LINEAR_GRADIENT;
-        this.gradientOrientation = TOP_BOTTOM;
-        return this;
+    public static StateListDrawableFactory selector(@StateListDrawableFactory.SelectorState int selectorState, Drawable selectDrawable, Drawable normalDrawable) {
+        return StateListDrawableFactory.getInstance().selector(selectorState,selectDrawable, normalDrawable);
     }
 
     /**
-     * 渐变样式
-     * 默认 线性渐变 GradientDrawable.LINEAR_GRADIENT
-     * 默认方向 从上到下渐变 GradientDrawable.Orientation.TOP_BOTTOM
+     * 是否按压背景状态选择器（背景颜色）
      *
-     * @param startColor 渐变开始端颜色 例：#ffffff
-     * @param endColor   渐变结束端颜色 例：#ffffff
-     * @return BaseShape
+     * @param pressedColorResId 触摸颜色 例：R.color.colorPrimary
+     * @param normalColorResId  正常颜色 例：R.color.colorPrimary
+     * @return DevSelector
      */
-    public ShapeFactory gradient(String startColor, String endColor) {
-        this.isGradient = true;
-        this.gradientColors = new int[2];
-        this.gradientColors[0] = Color.parseColor(startColor);
-        this.gradientColors[1] = Color.parseColor(endColor);
-        this.gradientType = GradientDrawable.LINEAR_GRADIENT;
-        this.gradientOrientation = TOP_BOTTOM;
-        return this;
-    }
-
-
-    /**
-     * 线性渐变样式
-     * 默认方向 从上到下渐变 GradientDrawable.Orientation.TOP_BOTTOM
-     *
-     * @param gradientColorsResId 渐变颜色数组 数组元素 例：R.color.colorPrimary
-     * @return BaseShape
-     */
-    public ShapeFactory gradientLinear(@ColorRes int... gradientColorsResId) {
-        this.isGradient = true;
-        this.gradientType = GradientDrawable.LINEAR_GRADIENT;
-        this.gradientOrientation = TOP_BOTTOM;
-        if (gradientColorsResId.length > 1) {
-            this.gradientColors = new int[gradientColorsResId.length];
-            for (int i = 0; i < gradientColorsResId.length; i++) {
-                this.gradientColors[i] = ShapeUtils.getContext().getResources().getColor(gradientColorsResId[i]);
-            }
-        } else {
-            throw new ExceptionInInitializerError("渐变颜色数组至少需要两个颜色");
-        }
-        return this;
-    }
-
-
-    /**
-     * 线性渐变样式
-     * 默认方向 从上到下渐变 TOP_BOTTOM
-     *
-     * @param gradientColorsResId 渐变颜色数组 数组元素 例：#ffffff
-     * @return BaseShape
-     */
-    public ShapeFactory gradientLinear(String... gradientColorsResId) {
-        this.isGradient = true;
-        this.gradientType = GradientDrawable.LINEAR_GRADIENT;
-        this.gradientOrientation = TOP_BOTTOM;
-        if (gradientColorsResId.length > 1) {
-            this.gradientColors = new int[gradientColorsResId.length];
-            for (int i = 0; i < gradientColorsResId.length; i++) {
-                this.gradientColors[i] = Color.parseColor(gradientColorsResId[i]);
-            }
-        } else {
-            throw new ExceptionInInitializerError("渐变颜色数组至少需要两个颜色");
-        }
-        return this;
+    public static StateListDrawableFactory selectorPressed(@ColorRes int pressedColorResId, @ColorRes int normalColorResId) {
+        return StateListDrawableFactory.getInstance().selectorPressed(new ColorDrawable(ShapeFactory.getContext().getResources().getColor(pressedColorResId)), new ColorDrawable(ShapeFactory.getContext().getResources().getColor(normalColorResId)));
     }
 
     /**
-     * 设置渐变方向
+     * .
+     * 是否按压背景状态选择器（背景颜色）
      *
-     * @param gradientOrientation 渐变方向
-     * @return BaseShape
+     * @param pressedColor 触摸颜色 例：#ffffff
+     * @param normalColor  正常颜色 例：#ffffff
+     * @return DevSelector
      */
-    public ShapeFactory orientation(@GradientOrientation String gradientOrientation) {
-        this.gradientOrientation = gradientOrientation;
-        return this;
+    public static StateListDrawableFactory selectorPressed(String pressedColor, String normalColor) {
+        return StateListDrawableFactory.getInstance().selectorPressed(new ColorDrawable(Color.parseColor(pressedColor)), new ColorDrawable(Color.parseColor(normalColor)));
     }
 
     /**
-     * 扫描渐变样式
+     * .
+     * 是否按压背景状态选择器（背景Drawable）
      *
-     * @param gradientColors 渐变颜色数组 数组元素 例：R.color.colorPrimary
-     * @return BaseShape
+     * @param pressedDrawable 触摸颜色 例：Context.getResources.getDrawable(R.drawable/mipmap.xxx)
+     * @param normalDrawable  正常颜色 例：Context.getResources.getDrawable(R.drawable/mipmap.xxx)
+     * @return DevSelector
      */
-    public ShapeFactory gradientSweep(@ColorRes int... gradientColors) {
-        this.isGradient = true;
-        this.gradientType = GradientDrawable.SWEEP_GRADIENT;
-        if (gradientColors.length > 1) {
-            this.gradientColors = new int[gradientColors.length];
-            for (int i = 0; i < gradientColors.length; i++) {
-                this.gradientColors[i] = ShapeUtils.getContext().getResources().getColor(gradientColors[i]);
-            }
-        } else {
-            throw new ExceptionInInitializerError("渐变颜色数组至少需要两个颜色");
-        }
-        return this;
-    }
-
-
-    /**
-     * 扫描渐变样式
-     *
-     * @param gradientColors 渐变颜色数组 数组元素 例：#ffffff
-     * @return BaseShape
-     */
-    public ShapeFactory gradientSweep(String... gradientColors) {
-        this.isGradient = true;
-        this.gradientType = GradientDrawable.SWEEP_GRADIENT;
-        if (gradientColors.length > 1) {
-            this.gradientColors = new int[gradientColors.length];
-            for (int i = 0; i < gradientColors.length; i++) {
-                this.gradientColors[i] = Color.parseColor(gradientColors[i]);
-            }
-        } else {
-            throw new ExceptionInInitializerError("渐变颜色数组至少需要两个颜色");
-        }
-        return this;
-    }
-
-
-    /**
-     * 辐射渐变样式
-     *
-     * @param gradientColors 渐变颜色数组 数组元素 例：R.color.colorPrimary
-     * @return BaseShape
-     */
-    public ShapeFactory gradientRadial(float radialRadius, int... gradientColors) {
-        this.isGradient = true;
-        this.gradientType = GradientDrawable.RADIAL_GRADIENT;
-        this.radialRadius = radialRadius;
-        if (gradientColors.length > 1) {
-            this.gradientColors = new int[gradientColors.length];
-            for (int i = 0; i < gradientColors.length; i++) {
-                this.gradientColors[i] = ShapeUtils.getContext().getResources().getColor(gradientColors[i]);
-            }
-        } else {
-            throw new ExceptionInInitializerError("渐变颜色数组至少需要两个颜色");
-        }
-        return this;
-    }
-
-
-    /**
-     * 辐射渐变样式
-     *
-     * @param gradientColors 渐变颜色数组 数组元素 例：#ffffff
-     * @param radialRadius   辐射渐变半径
-     * @return BaseShape
-     */
-    public ShapeFactory gradientRadial(float radialRadius, String... gradientColors) {
-        this.isGradient = true;
-        this.gradientType = GradientDrawable.RADIAL_GRADIENT;
-        this.radialRadius = radialRadius;
-        if (gradientColors.length > 1) {
-            this.gradientColors = new int[gradientColors.length];
-            for (int i = 0; i < gradientColors.length; i++) {
-                this.gradientColors[i] = Color.parseColor(gradientColors[i]);
-            }
-        } else {
-            throw new ExceptionInInitializerError("渐变颜色数组至少需要两个颜色");
-        }
-        return this;
-    }
-
-
-    // =============================================================================================
-
-
-    /**
-     * 设置圆角弧度 默认设置4个圆角
-     *
-     * @param radius 圆角弧度
-     */
-    public ShapeFactory radius(float radius) {
-        this.isRadius = true;
-        this.topRightRadius = radius;
-        this.topLeftRadius = radius;
-        this.bottomRightRadius = radius;
-        this.bottomLeftRadius = radius;
-        return this;
+    public static StateListDrawableFactory selectorPressed(Drawable pressedDrawable, Drawable normalDrawable) {
+        return StateListDrawableFactory.getInstance().selectorPressed(pressedDrawable, normalDrawable);
     }
 
     /**
-     * 设置右上圆角
      *
-     * @param topRightRadius 圆角弧度
-     * @return DevShape
-     */
-    public ShapeFactory trRadius(float topRightRadius) {
-        this.isRadius = true;
-        this.topRightRadius = topRightRadius;
-        return this;
-    }
-
-
-    /**
-     * 设置左上圆角
+     * 是否可用背景状态选择器（背景颜色）
      *
-     * @param topLeftRadius 圆角弧度
-     * @return DevShape
+     * @param enableColor view 可用颜色 例：#ffffff
+     * @param disableColor  view 不可用颜色 例：#ffffff
+     * @return DevSelector
      */
-    public ShapeFactory tlRadius(float topLeftRadius) {
-        this.isRadius = true;
-        this.topLeftRadius = topLeftRadius;
-        return this;
-    }
-
-
-    /**
-     * 设置右下圆角
-     *
-     * @param bottomRightRadius 圆角弧度
-     * @return DevShape
-     */
-    public ShapeFactory brRadius(float bottomRightRadius) {
-        this.isRadius = true;
-        this.bottomRightRadius = bottomRightRadius;
-        return this;
+    public static StateListDrawableFactory selectorEnable(String enableColor, String disableColor) {
+        return StateListDrawableFactory.getInstance().selectorEnable(new ColorDrawable(Color.parseColor(enableColor)), new ColorDrawable(Color.parseColor(disableColor)));
     }
 
     /**
-     * 设置左下圆角
+     * 是否可用背景状态选择器（背景颜色）
      *
-     * @param bottomLeftRadius 圆角弧度
-     * @return DevShape
+     * @param enableColor 触摸颜色 例：R.color.colorPrimary
+     * @param disableColor  正常颜色 例：R.color.colorPrimary
+     * @return DevSelector
      */
-    public ShapeFactory blRadius(float bottomLeftRadius) {
-        this.isRadius = true;
-        this.bottomLeftRadius = bottomLeftRadius;
-        return this;
-    }
-
-
-    // =============================================================================================
-
-
-    @Override
-    public void into(View view) {
-        view.setBackground(createShape());
-    }
-
-    @Override
-    public Drawable build() {
-        return createShape();
-    }
-
-
-    // =============================================================================================
-
-
-    /**
-     * 生成样式
-     *
-     * @return Drawable
-     */
-    private Drawable createShape() {
-        GradientDrawable drawable = new GradientDrawable();
-        if (shape == OVAL) {
-            drawable.setShape(GradientDrawable.OVAL);
-        } else {
-            drawable.setShape(GradientDrawable.RECTANGLE);
-        }
-        if (isRadius) {
-            float[] radii = {dip2px(topLeftRadius), dip2px(topLeftRadius),
-                    dip2px(topRightRadius), dip2px(topRightRadius),
-                    dip2px(bottomRightRadius), dip2px(bottomRightRadius),
-                    dip2px(bottomLeftRadius), dip2px(bottomLeftRadius)};
-            drawable.setCornerRadii(radii);//设置圆角
-        }
-
-        if (isBackgroundColor) {
-            drawable.setColor(backgroundColor);// 设置背景颜色
-        }
-
-        if (isLine) {
-            drawable.setStroke(dip2px(lineWidth), lineColor);// 设置边框线
-        }
-
-        if (isDashLine) {
-            drawable.setStroke(dip2px(dashLineWidth), dashLineColor, dip2px(dashWidth), dip2px(dashGap));//设置虚线
-        }
-
-        if (isGradient) {
-            switch (gradientType) {
-                case GradientDrawable.LINEAR_GRADIENT:
-                    drawable.setOrientation(createGradientOrientation());//设置线性渐变方向
-                    break;
-                case GradientDrawable.RADIAL_GRADIENT:
-                    drawable.setGradientRadius(dip2px(radialRadius));//设置辐射渐变辐射范围半径
-                    break;
-                case GradientDrawable.SWEEP_GRADIENT:
-                    break;
-            }
-            drawable.setGradientType(gradientType);
-            drawable.setColors(gradientColors);
-        }
-
-        return drawable;
+    public static StateListDrawableFactory selectorEnable(@ColorRes int enableColor, @ColorRes int disableColor) {
+        return StateListDrawableFactory.getInstance().selectorEnable(new ColorDrawable(ShapeFactory.getContext().getResources().getColor(enableColor)), new ColorDrawable(ShapeFactory.getContext().getResources().getColor(disableColor)));
     }
 
     /**
-     * 设置线性渐变方向
+     * .
+     * 是否按压背景状态选择器（背景Drawable）
      *
-     * @return GradientDrawable.Orientation
+     * @param enableDrawable 触摸颜色 例：Context.getResources.getDrawable(R.drawable/mipmap.xxx)
+     * @param disableDrawable  正常颜色 例：Context.getResources.getDrawable(R.drawable/mipmap.xxx)
+     * @return DevSelector
      */
-    private GradientDrawable.Orientation createGradientOrientation() {
-        GradientDrawable.Orientation orientation = GradientDrawable.Orientation.TOP_BOTTOM;
-        switch (gradientOrientation) {
-            case TOP_BOTTOM:
-                orientation = GradientDrawable.Orientation.TOP_BOTTOM;
-                break;
-            case TR_BL:
-                orientation = GradientDrawable.Orientation.TR_BL;
-                break;
-            case RIGHT_LEFT:
-                orientation = GradientDrawable.Orientation.RIGHT_LEFT;
-                break;
-            case BR_TL:
-                orientation = GradientDrawable.Orientation.BR_TL;
-                break;
-            case BOTTOM_TOP:
-                orientation = GradientDrawable.Orientation.BOTTOM_TOP;
-                break;
-            case BL_TR:
-                orientation = GradientDrawable.Orientation.BL_TR;
-                break;
-            case LEFT_RIGHT:
-                orientation = GradientDrawable.Orientation.LEFT_RIGHT;
-                break;
-            case TL_BR:
-                orientation = GradientDrawable.Orientation.TL_BR;
-                break;
-
-        }
-        return orientation;
+    public static StateListDrawableFactory selectorEnable(Drawable enableDrawable, Drawable disableDrawable) {
+        return StateListDrawableFactory.getInstance().selectorEnable(enableDrawable, disableDrawable);
     }
 
-
-    /**
-     * 单位转换工具类
-     *
-     * @param dipValue 值
-     * @return 返回值
-     */
-    private int dip2px(float dipValue) {
-        final float scale = ShapeUtils.getContext().getResources().getDisplayMetrics().density;
-        return (int) (dipValue * scale + 0.5f);
-    }
 
 }

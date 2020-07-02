@@ -23,9 +23,9 @@ import java.lang.annotation.RetentionPolicy;
  * 修订历史：
  * ================================================
  */
-public class SelectorFactory implements IShapeFactory<Drawable, View> {
+public class StateListDrawableFactory implements IShapeFactory<Drawable, View> {
 
-    static SelectorFactory mSelectorFactory;
+    static StateListDrawableFactory mStateListDrawableFactory;
     //选中背景颜色
     private Drawable mSelectDrawable;
     //正常背景颜色
@@ -78,20 +78,20 @@ public class SelectorFactory implements IShapeFactory<Drawable, View> {
     // =============================================================================================
 
 
-    private SelectorFactory() {
+    private StateListDrawableFactory() {
         // 构造方法私有
     }
 
-    public static SelectorFactory getInstance() {
-        mSelectorFactory = new SelectorFactory();
-        return mSelectorFactory;
+    public static StateListDrawableFactory getInstance() {
+        mStateListDrawableFactory = new StateListDrawableFactory();
+        return mStateListDrawableFactory;
     }
 
 
     // =============================================================================================
 
 
-    public SelectorFactory selector(@SelectorState int selectorState, Drawable selectDrawable, Drawable normalDrawable) {
+    public StateListDrawableFactory selector(@SelectorState int selectorState, Drawable selectDrawable, Drawable normalDrawable) {
         this.state = selectorState;
         this.mSelectDrawable = selectDrawable;
         this.mNormalDrawable = normalDrawable;
@@ -106,7 +106,7 @@ public class SelectorFactory implements IShapeFactory<Drawable, View> {
      * @param normalDrawable  正常颜色 例：Context.getResources.getDrawable(R.drawable/mipmap.xxx)
      * @return DevSelector
      */
-    public SelectorFactory selectorPressed(Drawable pressedDrawable, Drawable normalDrawable) {
+    public StateListDrawableFactory selectorPressed(Drawable pressedDrawable, Drawable normalDrawable) {
         this.state = STATE_PRESSED;
         this.mSelectDrawable = pressedDrawable;
         this.mNormalDrawable = normalDrawable;
@@ -121,7 +121,7 @@ public class SelectorFactory implements IShapeFactory<Drawable, View> {
      * @param disableDrawable 不可点击(可用)颜色 例：Context.getResources.getDrawable(R.drawable/mipmap.xxx)
      * @return DevSelector
      */
-    public SelectorFactory selectorEnable(Drawable enableDrawable, Drawable disableDrawable) {
+    public StateListDrawableFactory selectorEnable(Drawable enableDrawable, Drawable disableDrawable) {
         //this.state = STATE_ENABLED;
         this.state = STATE_SELECTED;
         this.mSelectDrawable = enableDrawable;
@@ -137,10 +137,10 @@ public class SelectorFactory implements IShapeFactory<Drawable, View> {
      * @param normalColorResId 正常颜色 例：R.color.colorPrimary
      * @return DevSelector
      */
-    public SelectorFactory selectorTextColor(@ColorRes int selectColorResId, @ColorRes int normalColorResId) {
+    public StateListDrawableFactory selectorTextColor(@ColorRes int selectColorResId, @ColorRes int normalColorResId) {
         this.isSelectorTextColor = true;
-        this.mSelectTextColor = ShapeUtils.getContext().getResources().getColor(selectColorResId);
-        this.mNormalTextColor = ShapeUtils.getContext().getResources().getColor(normalColorResId);
+        this.mSelectTextColor = ShapeFactory.getContext().getResources().getColor(selectColorResId);
+        this.mNormalTextColor = ShapeFactory.getContext().getResources().getColor(normalColorResId);
         return this;
     }
 
@@ -152,7 +152,7 @@ public class SelectorFactory implements IShapeFactory<Drawable, View> {
      * @param normalColor 正常颜色 例：#ffffff
      * @return DevSelector
      */
-    public SelectorFactory selectorTextColor(String selectColor, String normalColor) {
+    public StateListDrawableFactory selectorTextColor(String selectColor, String normalColor) {
         this.isSelectorTextColor = true;
         this.mSelectTextColor = Color.parseColor(selectColor);
         this.mNormalTextColor = Color.parseColor(normalColor);
@@ -167,7 +167,7 @@ public class SelectorFactory implements IShapeFactory<Drawable, View> {
      * @param normalColorResId 正常颜色 例：databinding获取的资源文件色值
      * @return DevSelector
      */
-    public SelectorFactory bindSelectorTextColor(int selectColorResId, int normalColorResId) {
+    public StateListDrawableFactory bindSelectorTextColor(int selectColorResId, int normalColorResId) {
         this.isSelectorTextColor = true;
         this.mSelectTextColor = selectColorResId;
         this.mNormalTextColor = normalColorResId;

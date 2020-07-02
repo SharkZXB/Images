@@ -15,7 +15,7 @@ import android.view.View;
  * 修订历史：
  * ================================================
  */
-public class LayerFactory implements IShapeFactory<Drawable, View> {
+public class LayerDrawableFactory implements IShapeFactory<Drawable, View> {
 
 
     /**
@@ -23,39 +23,39 @@ public class LayerFactory implements IShapeFactory<Drawable, View> {
      */
     private LayerDrawable drawable;
 
-    private LayerFactory(Drawable[] drawables) {
+    private LayerDrawableFactory(Drawable[] drawables) {
         drawable = new LayerDrawable(drawables);
     }
 
-    public static LayerFactory getInstance(Drawable... drawables) {
-        return new LayerFactory(drawables);
+    public static LayerDrawableFactory getInstance(Drawable... drawables) {
+        return new LayerDrawableFactory(drawables);
     }
 
 
     // =============================================================================================
 
 
-    public LayerFactory Left(int index, int px) {
+    public LayerDrawableFactory Left(int index, int px) {
         drawable.setLayerInset(index, 0, 0, 0, px);
         return this;
     }
 
-    public LayerFactory Top(int index, int px) {
+    public LayerDrawableFactory Top(int index, int px) {
         drawable.setLayerInset(index, 0, 0, 0, px);
         return this;
     }
 
-    public LayerFactory Right(int index, int px) {
+    public LayerDrawableFactory Right(int index, int px) {
         drawable.setLayerInset(index, 0, 0, 0, px);
         return this;
     }
 
-    public LayerFactory Bottom(int index, int px) {
+    public LayerDrawableFactory Bottom(int index, int px) {
         drawable.setLayerInset(index, 0, 0, 0, px);
         return this;
     }
 
-    public LayerFactory setInset(int index, int left, int top, int right, int bottom) {
+    public LayerDrawableFactory setInset(int index, int left, int top, int right, int bottom) {
         drawable.setLayerInset(index, left, top, right, bottom);
         return this;
     }
