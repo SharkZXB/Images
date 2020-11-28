@@ -25,8 +25,7 @@ import java.io.OutputStream;
  */
 public class ImageDiskLruCache {
 
-    public static final String TAG ="TAG";
-    private DiskLruCache mDiskLruCache;                             // 磁盘缓存对象
+    private DiskLruCache mDiskLruCache;
     private  boolean mIsDiskLruCacheCreated;                        // 是否初始化磁盘缓存对象
     private static final long DISK_CACHE_SIZE = 1024*1024*50;       // 磁盘缓存大小
     public static final int DISK_CACHE_INDEX = 0;                  // 缓存下标
